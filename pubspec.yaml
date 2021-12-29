@@ -60,6 +60,7 @@ flutter:
     - assets/images/image_start.jpg
     - assets/images/flag.png
     - assets/images/logo_grey.svg
+    - assets/images/image_call_simulator.svg
 
   #   - images/a_dot_ham.jpeg
 
