@@ -57,6 +57,10 @@ flutter:
   assets:
     - assets/images/phone_call.svg
     - assets/images/logo.png
+    - assets/images/image_start.jpg
+    - assets/images/flag.png
+    - assets/images/logo_grey.svg
+
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import 'package:my_app/pages/call_simulator.dart';
+import 'package:my_app/pages/start.dart';
 
 void main() =>
     runApp(const MaterialApp(debugShowCheckedModeBanner: false, home: MyApp()));
@@ -84,7 +84,7 @@ Widget subtitleWelcome(context) {
 Widget buttonStart(context) {
   return Container(
     width: MediaQuery.of(context).size.width * 0.85,
-    height: MediaQuery.of(context).size.height * 0.05,
+    height: MediaQuery.of(context).size.height * 0.06,
     margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.15),
     child: ElevatedButton(
       style: ElevatedButton.styleFrom(
@@ -95,7 +95,7 @@ Widget buttonStart(context) {
         Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const CallSimulator(),
+              builder: (context) => const Start(),
             ));
       },
       child: const Text(
