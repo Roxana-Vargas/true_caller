@@ -12,6 +12,8 @@ class Start extends StatefulWidget {
 }
 
 class _StartState extends State<Start> {
+  String textPhone = '';
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -44,7 +46,6 @@ class _StartState extends State<Start> {
                     subtitleStart(context),
                     inputForPhoneCode(context),
                     inputForEnterNumber(context),
-                    buttonNext(context),
                   ],
                 ),
               ),
@@ -55,110 +56,118 @@ class _StartState extends State<Start> {
       ),
     );
   }
-}
 
-Widget imageStart(context) {
-  return (SizedBox(
-    height: MediaQuery.of(context).size.height * 0.6,
-    width: MediaQuery.of(context).size.height,
-    child: Image.asset('images/image_start.jpg'),
-  ));
-}
+  Widget imageStart(context) {
+    return (SizedBox(
+      height: MediaQuery.of(context).size.height * 0.6,
+      width: MediaQuery.of(context).size.height,
+      child: Image.asset('assets/images/image_start.jpg'),
+    ));
+  }
 
-Widget titleStart(context) {
-  return (Text(
-    'True Caller K',
-    style: TextStyle(
-      fontSize: MediaQuery.of(context).size.height * 0.03,
-      fontWeight: FontWeight.w600,
-      color: Colors.white,
-    ),
-  ));
-}
-
-Widget subtitleStart(context) {
-  return (Container(
-    margin: EdgeInsets.symmetric(
-        vertical: MediaQuery.of(context).size.height * 0.035),
-    child: Text(
-      'Enter the cell phone number with which you want to simulate your call',
+  Widget titleStart(context) {
+    return (Text(
+      'True Caller K',
       style: TextStyle(
-        fontSize: MediaQuery.of(context).size.height * 0.02,
-        fontWeight: FontWeight.w400,
+        fontSize: MediaQuery.of(context).size.height * 0.03,
+        fontWeight: FontWeight.w600,
         color: Colors.white,
       ),
-      textAlign: TextAlign.center,
-    ),
-  ));
-}
+    ));
+  }
 
-Widget inputForPhoneCode(context) {
-  return (TextField(
-    style: TextStyle(
-      fontSize: MediaQuery.of(context).size.height * 0.02,
-    ),
-    enabled: false,
-    keyboardType: TextInputType.number,
-    decoration: InputDecoration(
-      suffixIcon: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 15.0),
-        child: Image.asset('images/flag.png'),
-        height: MediaQuery.of(context).size.height * 0.02,
+  Widget subtitleStart(context) {
+    return (Container(
+      margin: EdgeInsets.symmetric(
+          vertical: MediaQuery.of(context).size.height * 0.035),
+      child: Text(
+        'Enter the cell phone number with which you want to simulate your call',
+        style: TextStyle(
+          fontSize: MediaQuery.of(context).size.height * 0.02,
+          fontWeight: FontWeight.w400,
+          color: Colors.white,
+        ),
+        textAlign: TextAlign.center,
       ),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(30),
-      ),
-      filled: true,
-      fillColor: Colors.white,
-      labelText: "Perú +51",
-    ),
-  ));
-}
+    ));
+  }
 
-Widget inputForEnterNumber(context) {
-  return (Container(
-    margin: EdgeInsets.symmetric(
-        vertical: MediaQuery.of(context).size.height * 0.015),
-    child: TextField(
+  Widget inputForPhoneCode(context) {
+    return (TextField(
       style: TextStyle(
         fontSize: MediaQuery.of(context).size.height * 0.02,
       ),
+      enabled: false,
       keyboardType: TextInputType.number,
       decoration: InputDecoration(
+        suffixIcon: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 15.0),
+          child: Image.asset('assets/images/flag.png'),
+          height: MediaQuery.of(context).size.height * 0.02,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
         ),
         filled: true,
         fillColor: Colors.white,
-        hintText: "Enter the number to simulate the call",
+        labelText: "Perú +51",
       ),
-    ),
-  ));
-}
+    ));
+  }
 
-Widget buttonNext(context) {
-  return (Container(
-    margin: EdgeInsets.only(top: MediaQuery.of(context).size.width * 0.04),
-    width: MediaQuery.of(context).size.width * 0.9,
-    height: MediaQuery.of(context).size.height * 0.06,
-    child: ElevatedButton(
-      style: ElevatedButton.styleFrom(
-          shape: const StadiumBorder(),
-          primary: Colors.white,
-          onPrimary: const Color.fromARGB(255, 136, 71, 242)),
-      onPressed: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const CallSimulator(),
-            ));
-      },
-      child: const Text(
-        'Next',
-        style: TextStyle(fontSize: 16.0),
-      ),
-    ),
-  ));
+  Widget inputForEnterNumber(context) {
+    TextEditingController _numberPhoneController =
+        TextEditingController(text: "");
+
+    return Column(
+      children: [
+        Container(
+          margin: EdgeInsets.symmetric(
+              vertical: MediaQuery.of(context).size.height * 0.015),
+          child: TextField(
+            onChanged: (value) {
+              setState(() {
+                textPhone = value;
+              });
+            },
+            keyboardType: TextInputType.text,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+              filled: true,
+              fillColor: Colors.white,
+              hintText: "Enter the number to simulate the call",
+            ),
+          ),
+        ),
+        Container(
+          margin:
+              EdgeInsets.only(top: MediaQuery.of(context).size.width * 0.04),
+          width: MediaQuery.of(context).size.width * 0.9,
+          height: MediaQuery.of(context).size.height * 0.06,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                shape: const StadiumBorder(),
+                primary: Colors.white,
+                onPrimary: const Color.fromARGB(255, 136, 71, 242)),
+            onPressed: () {
+              debugPrint(_numberPhoneController.text);
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CallSimulator(textPhone),
+                  ));
+            },
+            child: const Text(
+              'Next',
+              style: TextStyle(fontSize: 16.0),
+            ),
+          ),
+        )
+      ],
+    );
+  }
 }
 
 Widget logo() {
@@ -167,7 +176,7 @@ Widget logo() {
     padding: const EdgeInsets.all(25.0),
     width: 130.0,
     child: SvgPicture.asset(
-      'images/logo_grey.svg',
+      'assets/images/logo_grey.svg',
     ),
   )));
 }

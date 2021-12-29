@@ -40,7 +40,7 @@ Widget logo(context) {
     margin: const EdgeInsets.only(top: 60.0, left: 30.0),
     child: SizedBox(
       width: MediaQuery.of(context).size.width * 0.25,
-      child: Image.asset('images/logo.png'),
+      child: Image.asset('assets/images/logo.png'),
     ),
   );
 }

@@ -8,30 +8,33 @@ import 'package:my_app/models/callcenter_agent.dart';
 import 'package:uuid/uuid.dart';
 import 'package:http/http.dart' as http;
 
-/* Get data of API */
-/*
-Future<CallCenterAgent> fetchCallCenterAgent() async {
-  final response = await http.get(Uri.parse(
-      'https://us-central1-seleccion-qa.cloudfunctions.net/getNumberphone?phone=51918604749'));
-  if (response.statusCode == 200) {
-    debugPrint(response.body);
-    return CallCenterAgent.fromJson(jsonDecode(response.body));
-  } else {
-    throw Exception('Failed');
-  }
-}
-*/
-void main() => runApp(const MaterialApp(
-    debugShowCheckedModeBanner: false, home: CallSimulator()));
+import '../services/rest_api_service.dart';
 
 class CallSimulator extends StatefulWidget {
-  const CallSimulator({Key? key}) : super(key: key);
+  final String numberPhone;
+
+  const CallSimulator(this.numberPhone, {Key? key}) : super(key: key);
 
   @override
   _CallSimulatorState createState() => _CallSimulatorState();
 }
 
 class _CallSimulatorState extends State<CallSimulator> {
+  late Future<CallCenterAgent> callCenterAgent;
+
+/* Get data of API */
+/*
+  Future<CallCenterAgent> fetchCallCenterAgent() async {
+    final response = await http.get(Uri.parse(
+        'https://us-central1-seleccion-qa.cloudfunctions.net/getNumberphone?phone=51${widget.numberPhone}'));
+    if (response.statusCode == 200) {
+      debugPrint(response.body);
+      return CallCenterAgent.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed');
+    }
+  }
+*/
   var uuid = const Uuid();
 
   void _incomingCall(String number) {
@@ -52,8 +55,7 @@ class _CallSimulatorState extends State<CallSimulator> {
   @override
   void initState() {
     super.initState();
-    /*fetchCallCenterAgent();*/
-    /*callCenterAgent = fetchCallCenterAgent();*/
+    callCenterAgent = fetchCallCenterAgent(widget.numberPhone);
     FlutterIncomingCall.configure(
       appName: 'example_incoming_call',
       duration: 30000,
@@ -101,7 +103,7 @@ class _CallSimulatorState extends State<CallSimulator> {
                   child: Column(
                     children: [
                       title(context),
-                      subtitle(context),
+                      subtitle(context, callCenterAgent),
                       avatar(context),
                       Container(
                         padding: EdgeInsets.all(
@@ -110,23 +112,26 @@ class _CallSimulatorState extends State<CallSimulator> {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             Button(
+                                tag: 'btnCall',
                                 colorButton:
                                     const Color.fromARGB(255, 71, 184, 76),
                                 callAction: () {
-                                  _incomingCall('51920234549');
+                                  _incomingCall(widget.numberPhone);
                                 },
                                 iconPhone: const Icon(Icons.call)),
                             Button(
+                                tag: 'btnWithDelay',
                                 colorButton:
                                     const Color.fromARGB(255, 248, 234, 34),
                                 callAction: () {
                                   Future.delayed(const Duration(seconds: 5),
                                       () {
-                                    _incomingCall('51918604749');
+                                    _incomingCall(widget.numberPhone);
                                   });
                                 },
                                 iconPhone: const Icon(Icons.add_ic_call)),
                             Button(
+                              tag: 'btnEndCall',
                               colorButton:
                                   const Color.fromARGB(255, 204, 53, 53),
                               callAction: () {
@@ -165,8 +170,7 @@ class _CallSimulatorState extends State<CallSimulator> {
                 child: Container(
                   padding: const EdgeInsets.all(25.0),
                   width: 130.0,
-                  child: Image.network(
-                      'https://www.grupokonecta.com/wp-content/uploads/2016/06/logo.png'),
+                  child: Image.asset('assets/images/logo.png'),
                 ),
               )
             ],
@@ -182,7 +186,7 @@ Widget imageCallSimulator(context) {
     height: MediaQuery.of(context).size.height * 0.45,
     width: MediaQuery.of(context).size.width,
     child: SvgPicture.asset(
-      'images/image_call_simulator.svg',
+      'assets/images/image_call_simulator.svg',
     ),
   ));
 }
@@ -191,28 +195,36 @@ Widget title(context) {
   return (Text(
     'Call Simulator',
     style: TextStyle(
-      fontSize: MediaQuery.of(context).size.height * 0.03,
+      fontSize: MediaQuery.of(context).size.height * 0.025,
       fontWeight: FontWeight.w500,
     ),
   ));
 }
 
-Widget subtitle(context) {
+Widget subtitle(context, modelCallCenterAgent) {
   return Container(
-    padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.02),
-    child: (Text(
-      'The person who will call you is Yudith',
-      style: TextStyle(
-        fontSize: MediaQuery.of(context).size.height * 0.02,
-        fontWeight: FontWeight.w300,
-      ),
-    )),
+    margin: EdgeInsets.symmetric(
+        vertical: MediaQuery.of(context).size.width * 0.05),
+    child: FutureBuilder<CallCenterAgent>(
+        future: modelCallCenterAgent,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return Text(
+              'The person who call you is ${snapshot.data!.name}',
+              style: TextStyle(
+                  fontSize: MediaQuery.of(context).size.height * 0.02),
+            );
+          } else if (snapshot.hasError) {
+            return Text('${snapshot.error}');
+          }
+          return const CircularProgressIndicator();
+        }),
   );
 }
 
 Widget avatar(context) {
   return (Padding(
-    padding: EdgeInsets.all(MediaQuery.of(context).size.height * 0.04),
+    padding: EdgeInsets.all(MediaQuery.of(context).size.height * 0.03),
     child: CircleAvatar(
       backgroundImage: const NetworkImage(
         'https://www.tu-voz.com/wp-content/uploads/2019/07/callcenter-telemarketing.jpg',
@@ -226,18 +238,20 @@ class Button extends StatelessWidget {
   final VoidCallback callAction; // Notice the variable type
   final Color colorButton;
   final Icon iconPhone;
+  final String tag;
 
   const Button({
     Key? key,
     required this.callAction,
     required this.colorButton,
     required this.iconPhone,
+    required this.tag,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton(
-      heroTag: 'btn1',
+      heroTag: tag,
       child: iconPhone,
       elevation: 15.0,
       backgroundColor: colorButton,
