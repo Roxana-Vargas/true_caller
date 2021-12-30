@@ -13,6 +13,7 @@ class Start extends StatefulWidget {
 
 class _StartState extends State<Start> {
   String textPhone = '';
+  bool isButtonActive = false;
 
   @override
   Widget build(BuildContext context) {
@@ -126,9 +127,12 @@ class _StartState extends State<Start> {
               vertical: MediaQuery.of(context).size.height * 0.015),
           child: TextField(
             onChanged: (value) {
-              setState(() {
-                textPhone = value;
-              });
+              if (value.length == 9) {
+                setState(() {
+                  isButtonActive = true;
+                  textPhone = value;
+                });
+              }
             },
             keyboardType: TextInputType.text,
             decoration: InputDecoration(
@@ -149,15 +153,21 @@ class _StartState extends State<Start> {
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
                 shape: const StadiumBorder(),
-                primary: Colors.white,
-                onPrimary: const Color.fromARGB(255, 136, 71, 242)),
+                primary: isButtonActive
+                    ? const Color.fromARGB(255, 66, 8, 201)
+                    : const Color.fromARGB(255, 216, 207, 216),
+                onPrimary: isButtonActive
+                    ? const Color.fromARGB(255, 247, 247, 248)
+                    : const Color.fromARGB(255, 126, 119, 126)),
             onPressed: () {
               debugPrint(_numberPhoneController.text);
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => CallSimulator(textPhone),
-                  ));
+              isButtonActive
+                  ? Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CallSimulator(textPhone),
+                      ))
+                  : null;
             },
             child: const Text(
               'Next',
