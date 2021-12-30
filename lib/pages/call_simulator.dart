@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'dart:convert';
+
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:flutter_incoming_call/flutter_incoming_call.dart';
 import 'package:my_app/models/callcenter_agent.dart';
 import 'package:uuid/uuid.dart';
-import 'package:http/http.dart' as http;
 
 import '../services/rest_api_service.dart';
 
@@ -104,7 +103,7 @@ class _CallSimulatorState extends State<CallSimulator> {
                     children: [
                       title(context),
                       subtitle(context, callCenterAgent),
-                      avatar(context),
+                      avatar(context, 0.03, 0.09),
                       Container(
                         padding: EdgeInsets.all(
                             MediaQuery.of(context).size.height * 0.025),
@@ -117,6 +116,8 @@ class _CallSimulatorState extends State<CallSimulator> {
                                     const Color.fromARGB(255, 71, 184, 76),
                                 callAction: () {
                                   _incomingCall(widget.numberPhone);
+                                  alertCallCenterAgent(context, callCenterAgent,
+                                      widget.numberPhone);
                                 },
                                 iconPhone: const Icon(Icons.call)),
                             Button(
@@ -136,26 +137,6 @@ class _CallSimulatorState extends State<CallSimulator> {
                                   const Color.fromARGB(255, 204, 53, 53),
                               callAction: () {
                                 _endAllCalls();
-                                showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return AlertDialog(
-                                        title: const Text('Name'),
-                                        content: const Text('Offer'),
-                                        actions: [
-                                          TextButton(
-                                              onPressed: () {
-                                                debugPrint('Yes');
-                                              },
-                                              child: const Text('Yes')),
-                                          TextButton(
-                                              onPressed: () {
-                                                debugPrint('No');
-                                              },
-                                              child: const Text('No')),
-                                        ],
-                                      );
-                                    });
                               },
                               iconPhone: const Icon(Icons.call_end),
                             ),
@@ -222,14 +203,14 @@ Widget subtitle(context, modelCallCenterAgent) {
   );
 }
 
-Widget avatar(context) {
-  return (Padding(
-    padding: EdgeInsets.all(MediaQuery.of(context).size.height * 0.03),
+Widget avatar(context, padding, heightAvatar) {
+  return (Container(
+    padding: EdgeInsets.all(MediaQuery.of(context).size.height * padding),
     child: CircleAvatar(
       backgroundImage: const NetworkImage(
         'https://www.tu-voz.com/wp-content/uploads/2019/07/callcenter-telemarketing.jpg',
       ),
-      radius: MediaQuery.of(context).size.height * 0.09,
+      radius: MediaQuery.of(context).size.height * heightAvatar,
     ),
   ));
 }
@@ -259,6 +240,108 @@ class Button extends StatelessWidget {
     );
   }
 }
+
+void alertCallCenterAgent(context, model, phone) {
+  showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Stack(
+          clipBehavior: Clip.none,
+          alignment: Alignment.center,
+          children: [
+            Container(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height * 0.3,
+                decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                  colors: [Color.fromARGB(255, 211, 193, 240), Colors.white],
+                  begin: FractionalOffset.topCenter,
+                  end: FractionalOffset.bottomCenter,
+                  stops: [0.75, 0.25],
+                  tileMode: TileMode.clamp,
+                )),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+                child: Column(
+                  children: [
+                    FutureBuilder<CallCenterAgent>(
+                        future: model,
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            return Column(children: [
+                              SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.22,
+                                child: Row(
+                                  children: [
+                                    avatar(context, 0.0, 0.07),
+                                    Container(
+                                      margin: const EdgeInsets.only(left: 30.0),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            snapshot.data!.name,
+                                            style: TextStyle(
+                                                fontFamily: 'RobotoMono',
+                                                fontWeight: FontWeight.w400,
+                                                decoration: TextDecoration.none,
+                                                color: Colors.black,
+                                                fontSize: MediaQuery.of(context)
+                                                        .size
+                                                        .height *
+                                                    0.03),
+                                          ),
+                                          Center(
+                                            child: Text(
+                                              snapshot.data!.enterprise,
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                  fontFamily: 'RobotoMono',
+                                                  fontWeight: FontWeight.w500,
+                                                  decoration:
+                                                      TextDecoration.none,
+                                                  color: Colors.white,
+                                                  fontSize:
+                                                      MediaQuery.of(context)
+                                                              .size
+                                                              .height *
+                                                          0.025),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  Text('$phone - Mobile',
+                                      style: TextStyle(
+                                          fontFamily: 'RobotoMono',
+                                          fontWeight: FontWeight.w400,
+                                          decoration: TextDecoration.none,
+                                          color: Colors.black,
+                                          fontSize: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.02))
+                                ],
+                              )
+                            ]);
+                          } else if (snapshot.hasError) {
+                            return Text('${snapshot.error}');
+                          }
+                          return const CircularProgressIndicator();
+                        }),
+                  ],
+                ))
+          ],
+        );
+      });
+}
+
 /*
 class Alert extends StatelessWidget {
   final String title, description, buttonText;
