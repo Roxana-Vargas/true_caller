@@ -17,6 +17,9 @@ class _StartState extends State<Start> {
 
   @override
   Widget build(BuildContext context) {
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Material App',
@@ -25,15 +28,14 @@ class _StartState extends State<Start> {
         body: Stack(
           children: [
             Container(),
-            imageStart(context),
+            imageStart(context, height, width),
             Positioned(
-              top: MediaQuery.of(context).size.height * 0.5,
+              top: height * 0.48,
               left: 0.0,
               right: 0.0,
               bottom: 0.0,
               child: Container(
-                padding:
-                    EdgeInsets.all(MediaQuery.of(context).size.height * 0.03),
+                padding: EdgeInsets.all(height * 0.03),
                 decoration: const BoxDecoration(
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(30.0),
@@ -43,10 +45,10 @@ class _StartState extends State<Start> {
                 ),
                 child: Column(
                   children: [
-                    titleStart(context),
-                    subtitleStart(context),
-                    inputForPhoneCode(context),
-                    inputForEnterNumber(context),
+                    titleStart(context, height),
+                    subtitleStart(context, height),
+                    inputForPhoneCode(context, height),
+                    inputForEnterNumber(context, height, width),
                   ],
                 ),
               ),
@@ -58,33 +60,32 @@ class _StartState extends State<Start> {
     );
   }
 
-  Widget imageStart(context) {
+  Widget imageStart(context, height, width) {
     return (SizedBox(
-      height: MediaQuery.of(context).size.height * 0.6,
-      width: MediaQuery.of(context).size.height,
+      height: height * 0.55,
+      width: width,
       child: Image.asset('assets/images/image_start.jpg'),
     ));
   }
 
-  Widget titleStart(context) {
+  Widget titleStart(context, height) {
     return (Text(
       'True Caller K',
       style: TextStyle(
-        fontSize: MediaQuery.of(context).size.height * 0.03,
+        fontSize: height * 0.03,
         fontWeight: FontWeight.w600,
         color: Colors.white,
       ),
     ));
   }
 
-  Widget subtitleStart(context) {
+  Widget subtitleStart(context, height) {
     return (Container(
-      margin: EdgeInsets.symmetric(
-          vertical: MediaQuery.of(context).size.height * 0.035),
+      margin: EdgeInsets.symmetric(vertical: height * 0.035),
       child: Text(
         'Enter the cell phone number with which you want to simulate your call',
         style: TextStyle(
-          fontSize: MediaQuery.of(context).size.height * 0.02,
+          fontSize: height * 0.02,
           fontWeight: FontWeight.w400,
           color: Colors.white,
         ),
@@ -93,18 +94,17 @@ class _StartState extends State<Start> {
     ));
   }
 
-  Widget inputForPhoneCode(context) {
+  Widget inputForPhoneCode(context, height) {
     return (TextField(
       style: TextStyle(
-        fontSize: MediaQuery.of(context).size.height * 0.02,
+        fontSize: height * 0.02,
       ),
       enabled: false,
-      keyboardType: TextInputType.number,
       decoration: InputDecoration(
         suffixIcon: Container(
           margin: const EdgeInsets.symmetric(horizontal: 15.0),
           child: Image.asset('assets/images/flag.png'),
-          height: MediaQuery.of(context).size.height * 0.02,
+          height: height * 0.02,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
@@ -116,15 +116,11 @@ class _StartState extends State<Start> {
     ));
   }
 
-  Widget inputForEnterNumber(context) {
-    TextEditingController _numberPhoneController =
-        TextEditingController(text: "");
-
+  Widget inputForEnterNumber(context, height, width) {
     return Column(
       children: [
         Container(
-          margin: EdgeInsets.symmetric(
-              vertical: MediaQuery.of(context).size.height * 0.015),
+          margin: EdgeInsets.symmetric(vertical: height * 0.015),
           child: TextField(
             onChanged: (value) {
               if (value.length == 9) {
@@ -134,7 +130,7 @@ class _StartState extends State<Start> {
                 });
               }
             },
-            keyboardType: TextInputType.text,
+            keyboardType: TextInputType.number,
             decoration: InputDecoration(
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(30),
@@ -146,10 +142,9 @@ class _StartState extends State<Start> {
           ),
         ),
         Container(
-          margin:
-              EdgeInsets.only(top: MediaQuery.of(context).size.width * 0.04),
-          width: MediaQuery.of(context).size.width * 0.9,
-          height: MediaQuery.of(context).size.height * 0.06,
+          margin: EdgeInsets.only(top: height * 0.025),
+          width: width * 0.9,
+          height: height * 0.06,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
                 shape: const StadiumBorder(),
@@ -160,7 +155,6 @@ class _StartState extends State<Start> {
                     ? const Color.fromARGB(255, 247, 247, 248)
                     : const Color.fromARGB(255, 126, 119, 126)),
             onPressed: () {
-              debugPrint(_numberPhoneController.text);
               isButtonActive
                   ? Navigator.push(
                       context,
@@ -178,15 +172,15 @@ class _StartState extends State<Start> {
       ],
     );
   }
-}
 
-Widget logo() {
-  return (SafeArea(
-      child: Container(
-    padding: const EdgeInsets.all(25.0),
-    width: 130.0,
-    child: SvgPicture.asset(
-      'assets/images/logo_grey.svg',
-    ),
-  )));
+  Widget logo() {
+    return (SafeArea(
+        child: Container(
+      padding: const EdgeInsets.all(25.0),
+      width: 130.0,
+      child: SvgPicture.asset(
+        'assets/images/logo_grey.svg',
+      ),
+    )));
+  }
 }
