@@ -11,20 +11,23 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
           backgroundColor: const Color.fromARGB(255, 136, 71, 242),
           body: Column(
             children: [
-              logo(context),
+              logo(context, width),
               Center(
                 child: Column(
                   children: [
-                    imageWelcome(context),
-                    titleWelcome(context),
-                    subtitleWelcome(context),
-                    buttonStart(context)
+                    imageWelcome(context, height),
+                    titleWelcome(context, height),
+                    subtitleWelcome(context, height),
+                    buttonStart(context, height, width)
                   ],
                 ),
               ),
@@ -34,58 +37,57 @@ class MyApp extends StatelessWidget {
   }
 }
 
-Widget logo(context) {
+Widget logo(context, width) {
   return Container(
     alignment: Alignment.topLeft,
     margin: const EdgeInsets.only(top: 60.0, left: 30.0),
     child: SizedBox(
-      width: MediaQuery.of(context).size.width * 0.25,
+      width: width * 0.25,
       child: Image.asset('assets/images/logo.png'),
     ),
   );
 }
 
-Widget imageWelcome(context) {
+Widget imageWelcome(context, height) {
   return Container(
-      margin: EdgeInsets.symmetric(
-          horizontal: 30.0, vertical: MediaQuery.of(context).size.height * 0.1),
+      margin: EdgeInsets.symmetric(horizontal: 30.0, vertical: height * 0.1),
       child: SvgPicture.asset(
         'assets/images/phone_call.svg',
-        height: MediaQuery.of(context).size.height * 0.25,
+        height: height * 0.25,
       ));
 }
 
-Widget titleWelcome(context) {
+Widget titleWelcome(context, height) {
   return Container(
       margin: const EdgeInsets.only(bottom: 20.0),
       child: Text(
         'True Caller k',
         style: TextStyle(
             color: Colors.white,
-            fontSize: MediaQuery.of(context).size.height * 0.03,
+            fontSize: height * 0.03,
             fontWeight: FontWeight.w600),
       ));
 }
 
-Widget subtitleWelcome(context) {
+Widget subtitleWelcome(context, height) {
   return Container(
     margin: const EdgeInsets.symmetric(horizontal: 30.0),
     child: Text(
       'Identify who is calling you and decide whether to attend them or not. also receive information about the best offers!',
       style: TextStyle(
         color: Colors.white,
-        fontSize: MediaQuery.of(context).size.height * 0.02,
+        fontSize: height * 0.02,
       ),
       textAlign: TextAlign.center,
     ),
   );
 }
 
-Widget buttonStart(context) {
+Widget buttonStart(context, height, width) {
   return Container(
-    width: MediaQuery.of(context).size.width * 0.85,
-    height: MediaQuery.of(context).size.height * 0.06,
-    margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.15),
+    width: width * 0.85,
+    height: height * 0.06,
+    margin: EdgeInsets.only(top: height * 0.15),
     child: ElevatedButton(
       style: ElevatedButton.styleFrom(
           shape: const StadiumBorder(),
