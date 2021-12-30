@@ -24,6 +24,7 @@ class _StartState extends State<Start> {
       debugShowCheckedModeBanner: false,
       title: 'Material App',
       home: Scaffold(
+        resizeToAvoidBottomInset: false,
         backgroundColor: Colors.white,
         body: Stack(
           children: [
