@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
-
 import 'package:flutter_svg/flutter_svg.dart';
 
-import 'package:flutter_incoming_call/flutter_incoming_call.dart';
+import 'package:my_app/utils/incoming_call.dart';
+import 'package:my_app/utils/alerts.dart';
+
 import 'package:my_app/models/callcenter_agent.dart';
-import 'package:uuid/uuid.dart';
 
 import '../services/rest_api_service.dart';
 
@@ -21,43 +20,16 @@ class CallSimulator extends StatefulWidget {
 class _CallSimulatorState extends State<CallSimulator> {
   late Future<CallCenterAgent> callCenterAgent;
 
-  var uuid = const Uuid();
-
-  void _incomingCall(String number) {
-    final uid = uuid.v4();
-    const avatar =
-        'https://scontent.fhel6-1.fna.fbcdn.net/v/t1.0-9/62009611_2487704877929752_6506356917743386624_n.jpg?_nc_cat=102&_nc_sid=09cbfe&_nc_ohc=cIgJjOYlVj0AX_J7pnl&_nc_ht=scontent.fhel6-1.fna&oh=ef2b213b74bd6999cd74e3d5de235cf4&oe=5F6E3331';
-    const type = HandleType.generic;
-    const handle = 'Incomin call example';
-    const isVideo = true;
-    FlutterIncomingCall.displayIncomingCall(
-        uid, number, avatar, handle, type, isVideo);
-  }
-
-  void _endAllCalls() {
-    FlutterIncomingCall.endAllCalls();
-  }
-
   @override
   void initState() {
     super.initState();
     callCenterAgent = fetchCallCenterAgent(widget.numberPhone);
-    FlutterIncomingCall.configure(
-      appName: 'example_incoming_call',
-      duration: 30000,
-      android: ConfigAndroid(
-        vibration: true,
-        ringtonePath: 'default',
-        channelId: 'calls',
-        channelName: 'Calls channel name',
-        channelDescription: 'Calls channel description',
-      ),
-    );
+    callConfiguration();
   }
 
   @override
   void dispose() {
-    _endAllCalls();
+    endAllCalls();
     super.dispose();
   }
 
@@ -102,9 +74,12 @@ class _CallSimulatorState extends State<CallSimulator> {
                                 colorButton:
                                     const Color.fromARGB(255, 71, 184, 76),
                                 callAction: () {
-                                  _incomingCall(widget.numberPhone);
-                                  alertCallCenterAgent(context, callCenterAgent,
-                                      widget.numberPhone);
+                                  incomingCall(widget.numberPhone);
+                                  alertCallCenterAgent(
+                                      context,
+                                      callCenterAgent,
+                                      widget.numberPhone,
+                                      avatar(context, 0.0, 0.07));
                                 },
                                 iconPhone: const Icon(Icons.call)),
                             Button(
@@ -114,7 +89,7 @@ class _CallSimulatorState extends State<CallSimulator> {
                                 callAction: () {
                                   Future.delayed(const Duration(seconds: 5),
                                       () {
-                                    _incomingCall(widget.numberPhone);
+                                    incomingCall(widget.numberPhone);
                                   });
                                 },
                                 iconPhone: const Icon(Icons.add_ic_call)),
@@ -123,7 +98,7 @@ class _CallSimulatorState extends State<CallSimulator> {
                               colorButton:
                                   const Color.fromARGB(255, 204, 53, 53),
                               callAction: () {
-                                _endAllCalls();
+                                endAllCalls();
                                 alertProductOffer(context, callCenterAgent);
                               },
                               iconPhone: const Icon(Icons.call_end),
@@ -227,152 +202,4 @@ class Button extends StatelessWidget {
       onPressed: callAction,
     );
   }
-}
-
-void alertCallCenterAgent(context, model, phone) {
-  showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Stack(
-          clipBehavior: Clip.none,
-          alignment: Alignment.center,
-          children: [
-            Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height * 0.3,
-                decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                  colors: [Color.fromARGB(255, 211, 193, 240), Colors.white],
-                  begin: FractionalOffset.topCenter,
-                  end: FractionalOffset.bottomCenter,
-                  stops: [0.75, 0.25],
-                  tileMode: TileMode.clamp,
-                )),
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-                child: Column(
-                  children: [
-                    FutureBuilder<CallCenterAgent>(
-                        future: model,
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            return Column(children: [
-                              SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.22,
-                                child: Row(
-                                  children: [
-                                    avatar(context, 0.0, 0.07),
-                                    Container(
-                                      margin: const EdgeInsets.only(left: 30.0),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            snapshot.data!.name,
-                                            style: TextStyle(
-                                                fontFamily: 'RobotoMono',
-                                                fontWeight: FontWeight.w400,
-                                                decoration: TextDecoration.none,
-                                                color: Colors.black,
-                                                fontSize: MediaQuery.of(context)
-                                                        .size
-                                                        .height *
-                                                    0.03),
-                                          ),
-                                          Center(
-                                            child: Text(
-                                              snapshot.data!.enterprise,
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                  fontFamily: 'RobotoMono',
-                                                  fontWeight: FontWeight.w500,
-                                                  decoration:
-                                                      TextDecoration.none,
-                                                  color: Colors.white,
-                                                  fontSize:
-                                                      MediaQuery.of(context)
-                                                              .size
-                                                              .height *
-                                                          0.025),
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  Text('$phone - Mobile',
-                                      style: TextStyle(
-                                          fontFamily: 'RobotoMono',
-                                          fontWeight: FontWeight.w400,
-                                          decoration: TextDecoration.none,
-                                          color: Colors.black,
-                                          fontSize: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.02))
-                                ],
-                              )
-                            ]);
-                          } else if (snapshot.hasError) {
-                            return Text('${snapshot.error}');
-                          }
-                          return const CircularProgressIndicator();
-                        }),
-                  ],
-                ))
-          ],
-        );
-      });
-}
-
-void alertProductOffer(context, model) {
-  showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          content: FutureBuilder<CallCenterAgent>(
-            future: model,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return Container(
-                  padding:
-                      EdgeInsets.all(MediaQuery.of(context).size.height * 0.01),
-                  height: MediaQuery.of(context).size.height * 0.14,
-                  child: Column(
-                    children: [
-                      Text(
-                        snapshot.data!.name,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      Text(snapshot.data!.offer)
-                    ],
-                  ),
-                );
-              } else if (snapshot.hasError) {
-                return Text('${snapshot.error}');
-              }
-              return const CircularProgressIndicator();
-            },
-          ),
-          actions: [
-            TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('Yes')),
-            TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('No')),
-          ],
-        );
-      });
 }
