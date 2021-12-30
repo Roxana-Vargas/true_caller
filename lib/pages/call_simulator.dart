@@ -21,19 +21,6 @@ class CallSimulator extends StatefulWidget {
 class _CallSimulatorState extends State<CallSimulator> {
   late Future<CallCenterAgent> callCenterAgent;
 
-/* Get data of API */
-/*
-  Future<CallCenterAgent> fetchCallCenterAgent() async {
-    final response = await http.get(Uri.parse(
-        'https://us-central1-seleccion-qa.cloudfunctions.net/getNumberphone?phone=51${widget.numberPhone}'));
-    if (response.statusCode == 200) {
-      debugPrint(response.body);
-      return CallCenterAgent.fromJson(jsonDecode(response.body));
-    } else {
-      throw Exception('Failed');
-    }
-  }
-*/
   var uuid = const Uuid();
 
   void _incomingCall(String number) {
@@ -137,6 +124,7 @@ class _CallSimulatorState extends State<CallSimulator> {
                                   const Color.fromARGB(255, 204, 53, 53),
                               callAction: () {
                                 _endAllCalls();
+                                alertProductOffer(context, callCenterAgent);
                               },
                               iconPhone: const Icon(Icons.call_end),
                             ),
@@ -342,49 +330,49 @@ void alertCallCenterAgent(context, model, phone) {
       });
 }
 
-/*
-class Alert extends StatelessWidget {
-  final String title, description, buttonText;
-  final Image image;
-
-  const Alert(
-      {Key? key,
-      required this.title,
-      required this.description,
-      required this.buttonText,
-      required this.image})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      elevation: 0,
-      backgroundColor: Colors.transparent,
-      child: dialogContent(context),
-    );
-  }
-
-  dialogContent(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          padding: const EdgeInsets.only(
-            top: 100.0,
-            bottom: 16.0,
-            right: 16.0,
-            left: 16.0,
+void alertProductOffer(context, model) {
+  showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          content: FutureBuilder<CallCenterAgent>(
+            future: model,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Container(
+                  padding:
+                      EdgeInsets.all(MediaQuery.of(context).size.height * 0.01),
+                  height: MediaQuery.of(context).size.height * 0.14,
+                  child: Column(
+                    children: [
+                      Text(
+                        snapshot.data!.name,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      Text(snapshot.data!.offer)
+                    ],
+                  ),
+                );
+              } else if (snapshot.hasError) {
+                return Text('${snapshot.error}');
+              }
+              return const CircularProgressIndicator();
+            },
           ),
-          margin: const EdgeInsets.only(top: 16.0),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.rectangle,
-            borderRadius: BorderRadius.circular(17),
-          ),
-        )
-      ],
-    );
-  }
-}*/
+          actions: [
+            TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('Yes')),
+            TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('No')),
+          ],
+        );
+      });
+}
